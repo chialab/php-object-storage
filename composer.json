@@ -1,0 +1,20 @@
+{
+    "name": "chialab/object-storage-adapters",
+    "description": "A collection of adapters for various object storage services.",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Chialab srl",
+            "email": "dev@chialab.io"
+        }
+    ],
+    "require": {
+        "php": "~8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Chialab\\ObjectStorageAdapters\\": "src/"
+        }
+    }
+}
