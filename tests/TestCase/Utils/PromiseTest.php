@@ -48,6 +48,7 @@ class PromiseTest extends TestCase
         $expected = 'example';
 
         $invoked = 0;
+        /** @var string $actual */
         $actual = Promise::async(function () use (&$invoked): PromiseInterface {
             $invoked++;
 
