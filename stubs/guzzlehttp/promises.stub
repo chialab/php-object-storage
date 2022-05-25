@@ -1,0 +1,54 @@
+<?php
+
+namespace GuzzleHttp\Promise;
+
+/**
+ * @template-covariant TFulfilled
+ */
+interface PromiseInterface
+{
+    /**
+     * @template TReturn
+     * @param (callable(TFulfilled): PromiseInterface<TReturn>) $onFulfilled
+     * @param callable(mixed): mixed $onRejected
+     * @return TReturn
+     */
+    public function then(
+        callable $onFulfilled = null,
+        callable $onRejected = null
+    );
+
+    /**
+     * @template TReturn
+     * @param callable(TFulfilled): TReturn $onRejected
+     * @return TReturn is PromiseInterface ? TReturn : PromiseInterface<TReturn>
+     */
+    public function otherwise(callable $onRejected);
+
+    /**
+     * @template TResolve extends TFulfilled
+     * @param TResolve $value
+     * @return void
+     */
+    public function resolve($value);
+
+    /**
+     * @param bool $unwrap
+     * @return TFulfilled
+     */
+    public function wait($unwrap = true);
+}
+
+/**
+ * @template TFulfilled
+ * @implements PromiseInterface<TFulfilled>
+ */
+class FulfilledPromise implements PromiseInterface
+{
+    /**
+     * @param TFulfilled $value
+     */
+    public function __construct($value)
+    {
+    }
+}

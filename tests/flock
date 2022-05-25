@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+declare(strict_types=1);
+
+array_shift($argv);
+$file = array_shift($argv);
+$signal = fopen('php://fd/9', 'a');
+
+fprintf(STDERR, "=====> Opening %s... ", $file);
+$fh = fopen($file, 'rb');
+fprintf(STDERR, "%s\n", $fh !== false ? 'OK' : 'FAIL');
+
+fprintf(STDERR, "=====> Locking %s... ", $file);
+fprintf(STDERR, "%s\n", flock($fh, LOCK_EX) ? 'OK' : 'FAIL');
+
+fprintf(STDERR, "=====> Signaling ready to go... ");
+fprintf(STDERR, "%s\n", fwrite($signal, '1') !== false ? 'OK' : 'FAIL');
+
+fprintf(STDERR, "=====> Executing `%s`... ", implode(' ', $argv));
+$proc = proc_open($argv, [STDIN, STDOUT, STDERR], $pipes);
+$code = proc_close($proc);
+fprintf(STDERR, "%s [%d]\n", $code === 0 ? 'OK' : 'FAIL', $code);
+
+fclose($fh);
+fclose($signal);
+
+exit($code);

@@ -1,6 +1,9 @@
-/.phpunit.result.cache
+/.phpunit.cache/
+/composer.lock
 /coverage/
 /phpcs.xml
 /phpstan.neon
 /phpunit.xml
+/tests/tmp/*
+!/tests/tmp/.gitkeep
 /vendor/
