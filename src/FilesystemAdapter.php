@@ -15,6 +15,9 @@ use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Stream as PsrStream;
 use Webmozart\Assert\Assert;
 
+/**
+ * Simulate an object storage using local filesystem.
+ */
 class FilesystemAdapter implements MultipartUploadInterface
 {
     /**
@@ -92,7 +95,8 @@ class FilesystemAdapter implements MultipartUploadInterface
 
             $file = Filesystem::lockingRead($path);
             try {
-                $copy = Stream::temporaryStreamCopy($file);
+                $copy = Stream::newTemporaryStream();
+                Stream::streamCopyToStream($file, $copy);
             } finally {
                 Stream::close($file);
             }

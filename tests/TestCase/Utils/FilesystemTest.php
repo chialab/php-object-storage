@@ -138,6 +138,7 @@ class FilesystemTest extends TestCase
      * @return void
      * @covers ::lockingWrite()
      * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
      * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingWrite(): void
@@ -159,6 +160,7 @@ class FilesystemTest extends TestCase
      * @return void
      * @covers ::lockingWrite()
      * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
      * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingWriteCallback(): void
@@ -193,6 +195,7 @@ class FilesystemTest extends TestCase
      * @return void
      * @covers ::lockingWrite()
      * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
      * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingWriteMultipleDataSources(): void
@@ -223,6 +226,7 @@ class FilesystemTest extends TestCase
      * @return void
      * @covers ::lockingWrite()
      * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
      * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingWriteExistingFile(): void

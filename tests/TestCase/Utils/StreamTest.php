@@ -5,6 +5,7 @@ namespace Chialab\ObjectStorage\Test\TestCase\Utils;
 
 use Chialab\ObjectStorage\Utils\Stream;
 use Generator;
+use GuzzleHttp\Psr7\Stream as PsrStream;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -16,12 +17,28 @@ use RuntimeException;
 class StreamTest extends TestCase
 {
     /**
-     * Test {@see Stream::temporaryStreamCopy()} method.
+     * Test {@see Stream::newTemporaryStream()} method.
      *
      * @return void
-     * @covers ::temporaryStreamCopy()
+     * @covers ::newTemporaryStream()
      */
-    public function testTemporaryStreamCopy(): void
+    public function testNewTemporaryStream(): void
+    {
+        $tmp = Stream::newTemporaryStream();
+
+        static::assertIsResource($tmp);
+        static::assertIsNotClosedResource($tmp);
+        static::assertSame(0, ftell($tmp));
+    }
+
+    /**
+     * Test {@see Stream::streamCopyToStream()} method.
+     *
+     * @return void
+     * @covers ::streamCopyToStream()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
+     */
+    public function testStreamCopyToStream(): void
     {
         $expected = 'hello world';
 
@@ -29,7 +46,9 @@ class StreamTest extends TestCase
         fwrite($fh, 'hello world');
         rewind($fh);
 
-        $copy = Stream::temporaryStreamCopy($fh);
+        $copy = Stream::newTemporaryStream();
+        Stream::streamCopyToStream($fh, $copy);
+        rewind($copy);
 
         static::assertIsResource($copy);
         static::assertIsNotClosedResource($copy);
@@ -40,6 +59,32 @@ class StreamTest extends TestCase
 
         static::assertIsNotClosedResource($fh, 'Original resource should not be closed');
         fclose($fh);
+    }
+
+    /**
+     * Test {@see Stream::psrCopyToStream()} method.
+     *
+     * @return void
+     * @covers ::psrCopyToStream()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
+     */
+    public function testPsrCopyToStream(): void
+    {
+        $original = new PsrStream(Stream::newTemporaryStream());
+        for ($i = 0; $i < 12; $i++) { // Write approx. 12 kb of random data.
+            $original->write(bin2hex(random_bytes(511)) . PHP_EOL);
+        }
+        $original->rewind();
+
+        $copy = Stream::newTemporaryStream();
+        Stream::psrCopyToStream($original, $copy);
+        rewind($copy);
+        $original->rewind();
+
+        static::assertIsResource($copy);
+        static::assertIsNotClosedResource($copy);
+        static::assertSame(0, ftell($copy));
+        static::assertSame($original->getContents(), stream_get_contents($copy));
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Chialab\ObjectStorage\Utils;
 
 use Chialab\ObjectStorage\Exception\StorageException;
+use Psr\Http\Message\StreamInterface;
 use Webmozart\Assert\Assert;
 
 /**
@@ -21,31 +22,55 @@ class Stream
     }
 
     /**
-     * Copy a stream contents into a temporary resource.
+     * Initialize a new temporary stream.
      *
-     * @param resource $resource Resource handler as opened by {@see fopen()}.
      * @return resource
      */
-    public static function temporaryStreamCopy($resource)
+    public static function newTemporaryStream()
     {
-        Assert::resource($resource, 'stream');
-
-        $copy = fopen('php://temp', 'rb+');
-        if ($copy === false) {
+        $fh = fopen('php://temp', 'rb+');
+        if ($fh === false) {
             throw new StorageException('Failed to open temporary stream');
         }
-        if (stream_copy_to_stream($resource, $copy) === false) {
-            static::close($copy);
 
-            throw new StorageException('Failed copy to temporary stream');
+        return $fh;
+    }
+
+    /**
+     * Copy a stream contents to another stream.
+     *
+     * @param resource $source Source stream resource handler as opened by {@see fopen()}.
+     * @param resource $dest Destination stream resource handler as opened by {@see fopen()}.
+     * @return void
+     */
+    public static function streamCopyToStream($source, $dest): void
+    {
+        Assert::resource($source, 'stream');
+        Assert::resource($dest, 'stream');
+
+        if (stream_copy_to_stream($source, $dest) === false) {
+            throw new StorageException('Failed copy to destination stream');
         }
-        if (rewind($copy) === false) {
-            static::close($copy);
+    }
 
-            throw new StorageException('Failed to rewind temporary stream');
+    /**
+     * Copy a PSR stream to another stream.
+     *
+     * @param \Psr\Http\Message\StreamInterface $source Source stream.
+     * @param resource $dest Destination stream resource handler as opened by {@see \fopen()}
+     * @return void
+     */
+    public static function psrCopyToStream(StreamInterface $source, $dest): void
+    {
+        Assert::resource($dest, 'stream');
+        Assert::true($source->isReadable(), 'PSR source stream must be readable');
+
+        while (!$source->eof()) {
+            $chunk = $source->read(1 << 13);
+            if (fwrite($dest, $chunk) < strlen($chunk)) {
+                throw new StorageException('Failed copy to destination stream');
+            }
         }
-
-        return $copy;
     }
 
     /**
