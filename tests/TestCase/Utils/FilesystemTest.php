@@ -318,7 +318,20 @@ class FilesystemTest extends TestCase
         ];
 
         $actual = [...Filesystem::recursiveLs($this->tmp . 'foo')];
-        static::assertSame($expected, array_keys($actual));
+        $paths = array_keys($actual);
+
+        static::assertEqualsCanonicalizing($expected, $paths);
+        static::assertSame($this->tmp . 'foo', array_key_last($actual), 'Expected foo/ to be the last element');
+        static::assertLessThan(
+            array_search($this->tmp . 'foo' . DIRECTORY_SEPARATOR . 'bar', $paths),
+            array_search($this->tmp . 'foo' . DIRECTORY_SEPARATOR . 'bar' . DIRECTORY_SEPARATOR . 'example.txt', $paths),
+            'Expected foo/bar/example.txt to be listed before foo/bar/',
+        );
+        static::assertLessThan(
+            array_search($this->tmp . 'foo' . DIRECTORY_SEPARATOR . 'bar', $paths),
+            array_search($this->tmp . 'foo' . DIRECTORY_SEPARATOR . 'bar' . DIRECTORY_SEPARATOR . 'baz', $paths),
+            'Expected foo/bar/baz/ to be listed before foo/bar/',
+        );
         static::assertContainsOnlyInstancesOf(SplFileInfo::class, $actual);
     }
 
