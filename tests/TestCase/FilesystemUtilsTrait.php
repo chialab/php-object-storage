@@ -71,23 +71,4 @@ trait FilesystemUtilsTrait
             proc_close($proc);
         }
     }
-
-    /**
-     * Return a stream with passed data as its content.
-     *
-     * @param string $data Stream content.
-     * @return resource
-     */
-    protected static function asStream(string $data)
-    {
-        $fh = fopen('php://memory', 'wb');
-        if ($fh === false) {
-            throw new RuntimeException('Cannot open in-memory stream');
-        }
-
-        fwrite($fh, $data);
-        rewind($fh);
-
-        return $fh;
-    }
 }

@@ -10,6 +10,7 @@ use Chialab\ObjectStorage\FileObject;
 use Chialab\ObjectStorage\FilePart;
 use Chialab\ObjectStorage\FilesystemAdapter;
 use Chialab\ObjectStorage\Utils\Filesystem;
+use Chialab\ObjectStorage\Utils\Stream;
 use GuzzleHttp\Psr7\Stream as PsrStream;
 use PHPUnit\Framework\TestCase;
 
@@ -159,7 +160,7 @@ class FilesystemAdapterTest extends TestCase
      */
     public function testPut(): void
     {
-        $obj = new FileObject('my-key', new PsrStream(static::asStream('my content')));
+        $obj = new FileObject('my-key', new PsrStream(Stream::fromString('my content')));
         $path = $this->tmp . 'files' . DIRECTORY_SEPARATOR . 'my-key';
 
         static::assertFileDoesNotExist($path);
@@ -180,7 +181,7 @@ class FilesystemAdapterTest extends TestCase
      */
     public function testPutOverwrite(): void
     {
-        $obj = new FileObject('example.txt', new PsrStream(static::asStream('my content')));
+        $obj = new FileObject('example.txt', new PsrStream(Stream::fromString('my content')));
         $path = $this->tmp . 'files' . DIRECTORY_SEPARATOR . 'example.txt';
 
         static::assertFileExists($path);
@@ -203,7 +204,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->expectExceptionObject(new BadDataException('Missing object data'));
 
-        $obj = new FileObject('my-key', new PsrStream(static::asStream('my content')));
+        $obj = new FileObject('my-key', new PsrStream(Stream::fromString('my content')));
         $obj->data?->detach();
         $path = $this->tmp . 'files' . DIRECTORY_SEPARATOR . 'my-key';
 
@@ -270,7 +271,7 @@ class FilesystemAdapterTest extends TestCase
         Filesystem::mkDir($path, 0700);
 
         $object = new FileObject('my-new-object.txt', null);
-        $stream = static::asStream('my data');
+        $stream = Stream::fromString('my data');
         $part = new FilePart(42, new PsrStream($stream));
         $hash = $this->adapter->multipartUpload($object, 'EXAMPLE-TOKEN', $part)->wait();
 
