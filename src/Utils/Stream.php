@@ -37,6 +37,25 @@ class Stream
     }
 
     /**
+     * Create a new in-memory stream from a string.
+     *
+     * @param string $data Data.
+     * @return resource
+     */
+    public static function fromString(string $data)
+    {
+        $fh = static::newTemporaryStream();
+        if (fwrite($fh, $data) === false) {
+            throw new StorageException('Failed write to destination stream');
+        }
+        if (fseek($fh, 0) !== 0) {
+            throw new StorageException('Failed seek position 0 on destination stream');
+        }
+
+        return $fh;
+    }
+
+    /**
      * Copy a stream contents to another stream.
      *
      * @param resource $source Source stream resource handler as opened by {@see fopen()}.
