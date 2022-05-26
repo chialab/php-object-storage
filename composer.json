@@ -14,7 +14,8 @@
         "guzzlehttp/promises": "^1.5",
         "psr/http-message": "^1.0",
         "guzzlehttp/psr7": "^2.2",
-        "webmozart/assert": "^1.10"
+        "webmozart/assert": "^1.10",
+        "aws/aws-sdk-php": "^3.222"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
