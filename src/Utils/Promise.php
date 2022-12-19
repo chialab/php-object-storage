@@ -25,9 +25,8 @@ class Promise
     /**
      * Wrap a callable in a promise.
      *
-     * @template TReturn
-     * @param callable(): TReturn $cb Callable.
-     * @return \GuzzleHttp\Promise\PromiseInterface<TReturn>
+     * @param callable(): mixed $cb Callable.
+     * @return \GuzzleHttp\Promise\PromiseInterface
      */
     public static function async(callable $cb): PromiseInterface
     {

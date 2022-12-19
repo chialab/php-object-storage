@@ -121,6 +121,7 @@ class InMemoryAdapterTest extends TestCase
 
         static::assertTrue($this->adapter->has('example')->wait());
         $stored = $this->adapter->get('example')->wait();
+        static::assertInstanceOf(FileObject::class, $stored);
         static::assertNotSame($object, $stored);
         static::assertSame('example', $stored->key);
         static::assertNotSame($object->data, $stored->data);
@@ -160,6 +161,7 @@ class InMemoryAdapterTest extends TestCase
 
         $part = new FilePart(42, new PsrStream(Stream::fromString('world!')));
         $hash = $this->adapter->multipartUpload($object, $token, $part)->wait();
+        static::assertIsString($hash);
         static::assertSame(hash('sha256', 'world!'), $hash);
         $parts[] = new FilePart(42, null, $hash);
 
@@ -169,6 +171,7 @@ class InMemoryAdapterTest extends TestCase
 
         static::assertTrue($this->adapter->has('example')->wait());
         $actual = $this->adapter->get('example')->wait();
+        static::assertInstanceOf(FileObject::class, $actual);
         static::assertSame('hello world!', $actual->data?->getContents());
     }
 
@@ -215,12 +218,17 @@ class InMemoryAdapterTest extends TestCase
     {
         $object = new FileObject('example', null);
         $token = $this->adapter->multipartInit($object)->wait();
+        static::assertIsString($token);
 
         $part = new FilePart(1, new PsrStream(Stream::fromString('hello ')));
-        $parts[] = new FilePart(1, null, $this->adapter->multipartUpload($object, $token, $part)->wait());
+        $hash = $this->adapter->multipartUpload($object, $token, $part)->wait();
+        static::assertIsString($hash);
+        $parts[] = new FilePart(1, null, $hash);
 
         $part = new FilePart(42, new PsrStream(Stream::fromString('world!')));
-        $parts[] = new FilePart(42, null, $this->adapter->multipartUpload($object, $token, $part)->wait());
+        $hash = $this->adapter->multipartUpload($object, $token, $part)->wait();
+        static::assertIsString($hash);
+        $parts[] = new FilePart(42, null, $hash);
 
         $this->expectExceptionObject(new BadDataException('Multipart upload not initialized: ' . $token));
         $this->adapter->multipartFinalize(new FileObject('ANOTHER-KEY', null), $token, ...$parts)->wait();
@@ -238,12 +246,17 @@ class InMemoryAdapterTest extends TestCase
     {
         $object = new FileObject('example', null);
         $token = $this->adapter->multipartInit($object)->wait();
+        static::assertIsString($token);
 
         $part = new FilePart(1, new PsrStream(Stream::fromString('hello ')));
-        $parts[] = new FilePart(1, null, $this->adapter->multipartUpload($object, $token, $part)->wait());
+        $hash = $this->adapter->multipartUpload($object, $token, $part)->wait();
+        static::assertIsString($hash);
+        $parts[] = new FilePart(1, null, $hash);
 
         $part = new FilePart(42, new PsrStream(Stream::fromString('world!')));
-        $parts[] = new FilePart(42, null, $this->adapter->multipartUpload($object, $token, $part)->wait());
+        $hash = $this->adapter->multipartUpload($object, $token, $part)->wait();
+        static::assertIsString($hash);
+        $parts[] = new FilePart(42, null, $hash);
 
         $this->expectExceptionObject(new BadDataException('Parts must be sorted monotonically'));
         $this->adapter->multipartFinalize($object, $token, ...array_reverse($parts))->wait();
@@ -262,13 +275,16 @@ class InMemoryAdapterTest extends TestCase
     {
         $object = new FileObject('example', null);
         $token = $this->adapter->multipartInit($object)->wait();
+        static::assertIsString($token);
 
         $part = new FilePart(1, new PsrStream(Stream::fromString('hello ')));
         $hash = $this->adapter->multipartUpload($object, $token, $part)->wait();
+        static::assertIsString($hash);
         $parts[] = new FilePart(1, null, $hash);
 
         $part = new FilePart(42, new PsrStream(Stream::fromString('world!')));
         $hash = $this->adapter->multipartUpload($object, $token, $part)->wait();
+        static::assertIsString($hash);
         $parts[] = new FilePart(42, null, strrev($hash)); // Hash is reversed.
 
         $this->expectExceptionObject(new BadDataException('Hash mismatch for part 42'));
@@ -289,6 +305,7 @@ class InMemoryAdapterTest extends TestCase
         $part = new FilePart(1, new PsrStream(Stream::fromString('hello ')));
 
         $token = $this->adapter->multipartInit($object)->wait();
+        static::assertIsString($token);
         $this->adapter->multipartUpload($object, $token, $part)->wait();
 
         $this->adapter->multipartAbort($object, $token)->wait();
