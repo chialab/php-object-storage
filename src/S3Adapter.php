@@ -29,11 +29,13 @@ class S3Adapter implements MultipartUploadInterface
      * @param \Aws\S3\S3Client $client S3 client instance.
      * @param string $bucket Bucket name.
      * @param string $prefix Key prefix.
+     * @param string|null $baseUrl Custom base for objects URLs.
      */
     public function __construct(
         protected readonly S3Client $client,
         protected readonly string $bucket,
         protected readonly string $prefix = '',
+        protected readonly ?string $baseUrl = null,
     ) {
     }
 
@@ -53,6 +55,14 @@ class S3Adapter implements MultipartUploadInterface
      */
     public function url(string $key): string
     {
+        if (!empty($this->baseUrl)) {
+            return sprintf(
+                '%s/%s',
+                rtrim($this->baseUrl, '/'),
+                ltrim($this->prefix($key), '/')
+            );
+        }
+
         return $this->client->getObjectUrl($this->bucket, $this->prefix($key));
     }
 
