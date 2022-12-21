@@ -49,9 +49,27 @@ class S3AdapterTest extends TestCase
         ]);
     }
 
-    public function testUrl(): void
+    /**
+     * Test {@see S3Adapter::url()} method.
+     *
+     * @param string $expected
+     * @param string|null $baseUrl
+     * @param string $bucket
+     * @param string $prefix
+     * @param string $file
+     * @return void
+     * @testWith ["https://example-bucket.s3.eu-south-1.amazonaws.com/prefix/read-me-tenderly.txt", null, "example-bucket", "prefix/", "read-me-tenderly.txt"]
+     *           ["https://example.xyz/profix/pro-players-csgo-major.txt", "https://example.xyz", "another-bucket", "profix/", "pro-players-csgo-major.txt"]
+     * @covers ::url()
+     * @covers ::prefix()
+     */
+    public function testUrl(string $expected, string|null $baseUrl, string $bucket, string $prefix, string $file): void
     {
+        $client = static::s3ClientFactory();
+        $adapter = new S3Adapter($client, $bucket, $prefix, $baseUrl);
+        $url = $adapter->url($file);
 
+        static::assertEquals($expected, $url);
     }
 
     /**
