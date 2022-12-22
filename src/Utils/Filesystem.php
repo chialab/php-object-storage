@@ -59,7 +59,7 @@ class Filesystem
         if ($fh === false) {
             throw new StorageException(sprintf('Cannot open: %s', $path));
         }
-        if (flock($fh, LOCK_SH | LOCK_NB, $wouldBlock) === false || $wouldBlock === true) {
+        if (flock($fh, LOCK_SH | LOCK_NB, $wouldBlock) === false || $wouldBlock === 1) {
             Stream::close($fh);
 
             throw new StorageException(sprintf('Cannot acquire shared lock: %s', $path));
@@ -87,7 +87,7 @@ class Filesystem
             throw new StorageException(sprintf('Cannot open: %s', $path));
         }
         try {
-            if (flock($fh, LOCK_EX | LOCK_NB, $wouldBlock) !== true || $wouldBlock === true) {
+            if (flock($fh, LOCK_EX | LOCK_NB, $wouldBlock) !== true || $wouldBlock === 1) {
                 throw new StorageException(sprintf('Cannot acquire exclusive lock: %s', $path));
             }
             if (ftruncate($fh, 0) !== true) {

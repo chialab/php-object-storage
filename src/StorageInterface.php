@@ -22,7 +22,7 @@ interface StorageInterface
      * Check if an object exists in the storage.
      *
      * @param string $key Object key.
-     * @return \GuzzleHttp\Promise\PromiseInterface<bool>
+     * @return \GuzzleHttp\Promise\PromiseInterface
      */
     public function has(string $key): PromiseInterface;
 
@@ -30,7 +30,7 @@ interface StorageInterface
      * Get an object from the storage.
      *
      * @param string $key Object key.
-     * @return \GuzzleHttp\Promise\PromiseInterface<\Chialab\ObjectStorage\FileObject>
+     * @return \GuzzleHttp\Promise\PromiseInterface
      */
     public function get(string $key): PromiseInterface;
 
@@ -38,7 +38,7 @@ interface StorageInterface
      * Put (insert or replace) an object to the object storage.
      *
      * @param \Chialab\ObjectStorage\FileObject $object Object key.
-     * @return \GuzzleHttp\Promise\PromiseInterface<void>
+     * @return \GuzzleHttp\Promise\PromiseInterface
      */
     public function put(FileObject $object): PromiseInterface;
 
@@ -46,7 +46,7 @@ interface StorageInterface
      * Delete an object from the storage.
      *
      * @param string $key Object key.
-     * @return \GuzzleHttp\Promise\PromiseInterface<void>
+     * @return \GuzzleHttp\Promise\PromiseInterface
      */
     public function delete(string $key): PromiseInterface;
 }

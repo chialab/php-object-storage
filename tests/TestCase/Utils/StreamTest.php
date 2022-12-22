@@ -32,6 +32,23 @@ class StreamTest extends TestCase
     }
 
     /**
+     * Test {@see Stream::fromString()} method.
+     *
+     * @return void
+     * @covers ::fromString()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
+     */
+    public function testFromString(): void
+    {
+        $fh = Stream::fromString('hello world!');
+
+        static::assertIsResource($fh);
+        static::assertIsNotClosedResource($fh);
+        static::assertSame(0, ftell($fh));
+        static::assertSame('hello world!', stream_get_contents($fh));
+    }
+
+    /**
      * Test {@see Stream::streamCopyToStream()} method.
      *
      * @return void

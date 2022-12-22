@@ -6,6 +6,7 @@ namespace Chialab\ObjectStorage\Test\TestCase\Utils;
 use Chialab\ObjectStorage\Exception\StorageException;
 use Chialab\ObjectStorage\Test\TestCase\FilesystemUtilsTrait;
 use Chialab\ObjectStorage\Utils\Filesystem;
+use Chialab\ObjectStorage\Utils\Stream;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use SplFileInfo;
@@ -138,6 +139,8 @@ class FilesystemTest extends TestCase
      * @return void
      * @covers ::lockingWrite()
      * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::fromString()
      * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
      * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
@@ -148,7 +151,7 @@ class FilesystemTest extends TestCase
         $filename = $this->tmp . 'foos-and-bars.txt';
         static::assertFileDoesNotExist($filename);
 
-        Filesystem::lockingWrite($filename, 0600, null, static::asStream('foo bar'));
+        Filesystem::lockingWrite($filename, 0600, null, Stream::fromString('foo bar'));
 
         static::assertFileExists($filename);
         static::assertSame($expected, file_get_contents($filename));
@@ -160,6 +163,8 @@ class FilesystemTest extends TestCase
      * @return void
      * @covers ::lockingWrite()
      * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::fromString()
      * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
      * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
@@ -181,7 +186,7 @@ class FilesystemTest extends TestCase
 
                 $read = fread($fh, 1024);
             },
-            static::asStream('foo bar')
+            Stream::fromString('foo bar')
         );
 
         static::assertFileExists($filename);
@@ -195,6 +200,8 @@ class FilesystemTest extends TestCase
      * @return void
      * @covers ::lockingWrite()
      * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::fromString()
      * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
      * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
@@ -211,7 +218,7 @@ class FilesystemTest extends TestCase
          */
         $gen = function (string ...$data): iterable {
             foreach ($data as $datum) {
-                yield static::asStream($datum);
+                yield Stream::fromString($datum);
             }
         };
         Filesystem::lockingWrite($filename, 0600, null, ...$gen("foo\n", "bar\n", "baz\n"));
@@ -226,6 +233,8 @@ class FilesystemTest extends TestCase
      * @return void
      * @covers ::lockingWrite()
      * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::fromString()
      * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
      * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
@@ -237,7 +246,7 @@ class FilesystemTest extends TestCase
         static::assertFileExists($filename);
         static::assertNotSame($expected, file_get_contents($filename));
 
-        Filesystem::lockingWrite($filename, 0600, null, static::asStream('foo bar'));
+        Filesystem::lockingWrite($filename, 0600, null, Stream::fromString('foo bar'));
 
         static::assertFileExists($filename);
         static::assertSame($expected, file_get_contents($filename));
@@ -249,6 +258,8 @@ class FilesystemTest extends TestCase
      * @return void
      * @covers ::lockingWrite()
      * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
+     * @uses \Chialab\ObjectStorage\Utils\Stream::fromString()
      * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingWriteFileInUse(): void
@@ -256,7 +267,7 @@ class FilesystemTest extends TestCase
         $this->withFlock($this->tmp . 'example.txt', function (): void {
             $this->expectExceptionObject(new StorageException('Cannot acquire exclusive lock: ' . $this->tmp . 'example.txt'));
 
-            Filesystem::lockingWrite($this->tmp . 'example.txt', 0600, null, static::asStream('foo bar'));
+            Filesystem::lockingWrite($this->tmp . 'example.txt', 0600, null, Stream::fromString('foo bar'));
         });
     }
 
