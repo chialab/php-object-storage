@@ -39,3 +39,10 @@ Takes an ordered array of arguments:
 2. the name of the bucket
 3. an optional key prefix to use for all files (defaults to empty)
 4. an optional custom base for object URLs (defaults to empty)
+
+### `InMemoryAdapter`
+
+This adapter uses volatile memory to store objects.
+
+Takes only one argument:
+1. base for object URLs
