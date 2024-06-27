@@ -15,7 +15,7 @@ class FileObject
      *
      * @var string
      */
-    public static $defaultContentType = 'application/octet-stream';
+    public const DEFAULT_CONTENT_TYPE = 'application/octet-stream';
 
     /**
      * Constructor.
@@ -35,10 +35,6 @@ class FileObject
      */
     public function getContentType(): string
     {
-        if (isset($this->metadata['ContentType']) && $this->metadata['ContentType'] !== null) {
-            return $this->metadata['ContentType'];
-        }
-
-        return static::$defaultContentType;
+        return $this->metadata['ContentType'] ?? static::DEFAULT_CONTENT_TYPE;
     }
 }

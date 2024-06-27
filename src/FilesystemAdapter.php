@@ -102,7 +102,7 @@ class FilesystemAdapter implements MultipartUploadInterface
             }
 
             return new FileObject($key, new PsrStream($copy), [
-                'ContentType' => mime_content_type($path),
+                'ContentType' => mime_content_type($path) ?: null,
             ]);
         });
     }
