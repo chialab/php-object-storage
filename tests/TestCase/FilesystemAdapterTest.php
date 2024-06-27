@@ -129,7 +129,8 @@ class FilesystemAdapterTest extends TestCase
     /**
      * Test {@see FilesystemAdapter::get()} method.
      *
-     * @param string|false $expected Expected result.
+     * @param string|false $expectedData Expected content data.
+     * @param string $expectedContentData Expected content type.
      * @param string $key Key to retrieve.
      * @return void
      * @covers ::get()
