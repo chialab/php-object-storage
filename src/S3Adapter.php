@@ -128,6 +128,7 @@ class S3Adapter implements MultipartUploadInterface
             ->putObjectAsync([
                 'Bucket' => $this->bucket,
                 'Key' => $this->prefix($object->key),
+                'ContentType' => $object->getContentType(),
                 'Body' => $body,
             ])
             ->then(
@@ -165,6 +166,7 @@ class S3Adapter implements MultipartUploadInterface
             ->createMultipartUploadAsync([
                 'Bucket' => $this->bucket,
                 'Key' => $this->prefix($object->key),
+                'ContentType' => $object->getContentType(),
             ])
             ->then(
                 fn (Result $result): string => is_string($result['UploadId']) ? $result['UploadId'] : throw new UnexpectedValueException(sprintf('Expected %s to be string, got %s', 'UploadId', get_debug_type($result['UploadId']))),

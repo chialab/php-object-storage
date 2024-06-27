@@ -11,6 +11,13 @@ use Psr\Http\Message\StreamInterface;
 class FileObject
 {
     /**
+     * Default content type.
+     *
+     * @var string
+     */
+    public const DEFAULT_CONTENT_TYPE = 'application/octet-stream';
+
+    /**
      * Constructor.
      *
      * @param string $key Object key.
@@ -19,5 +26,15 @@ class FileObject
      */
     public function __construct(public readonly string $key, public readonly StreamInterface|null $data, public readonly array $metadata = [])
     {
+    }
+
+    /**
+     * Get the content type of the object.
+     *
+     * @return string
+     */
+    public function getContentType(): string
+    {
+        return $this->metadata['ContentType'] ?? static::DEFAULT_CONTENT_TYPE;
     }
 }
