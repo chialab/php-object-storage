@@ -309,7 +309,9 @@ class S3AdapterTest extends TestCase
 
         $adapter = new S3Adapter($client, 'example-bucket', 'prefix/');
 
-        $adapter->put(new FileObject('hello-world.txt', new PsrStream(Stream::fromString('hello world!'))))->wait();
+        $adapter->put(new FileObject('hello-world.txt', new PsrStream(Stream::fromString('hello world!')), [
+            'ContentType' => 'text/plain',
+        ]))->wait();
 
         static::assertSame(['PutObject'], $invocations);
     }

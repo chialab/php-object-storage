@@ -35,9 +35,10 @@ class FileObject
      */
     public function getContentType(): string
     {
-        if ($this->metadata['ContentType'] !== null) {
+        if (isset($this->metadata['ContentType']) && $this->metadata['ContentType'] !== null) {
             return $this->metadata['ContentType'];
         }
-        return mime_content_type($this->key) ?: static::$defaultContentType;
+
+        return static::$defaultContentType;
     }
 }
