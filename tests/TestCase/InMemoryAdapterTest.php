@@ -116,7 +116,9 @@ class InMemoryAdapterTest extends TestCase
             fn () => $this->adapter->put(new FileObject('example', null))->wait(),
         );
 
-        $object = new FileObject('example', new PsrStream(Stream::fromString('hello world!')));
+        $object = new FileObject('example', new PsrStream(Stream::fromString('hello world!')), [
+            'ContentType' => 'text/plain',
+        ]);
         $this->adapter->put($object)->wait();
 
         static::assertTrue($this->adapter->has('example')->wait());
@@ -126,6 +128,7 @@ class InMemoryAdapterTest extends TestCase
         static::assertSame('example', $stored->key);
         static::assertNotSame($object->data, $stored->data);
         static::assertSame('hello world!', $stored->data?->getContents());
+        static::assertSame('text/plain', $stored->getContentType());
 
         $this->adapter->delete('example')->wait();
         static::assertFalse($this->adapter->has('example')->wait());
@@ -147,7 +150,9 @@ class InMemoryAdapterTest extends TestCase
     {
         static::assertFalse($this->adapter->has('example')->wait());
 
-        $object = new FileObject('example', null);
+        $object = new FileObject('example', null, [
+            'ContentType' => 'text/plain',
+        ]);
         $token = $this->adapter->multipartInit($object)->wait();
         static::assertIsString($token);
         static::assertNotEmpty($token);
@@ -173,6 +178,7 @@ class InMemoryAdapterTest extends TestCase
         $actual = $this->adapter->get('example')->wait();
         static::assertInstanceOf(FileObject::class, $actual);
         static::assertSame('hello world!', $actual->data?->getContents());
+        static::assertSame('text/plain', $actual->getContentType());
     }
 
     /**

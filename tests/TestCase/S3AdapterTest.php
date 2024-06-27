@@ -172,7 +172,11 @@ class S3AdapterTest extends TestCase
                     static::assertSame('example-bucket', $command['Bucket']);
 
                     return match ($command['Key']) {
-                        'prefix/hello-world.txt' => new Result(['ContentLength' => 12, 'Body' => Stream::fromString('hello world!')]),
+                        'prefix/hello-world.txt' => new Result([
+                            'ContentLength' => 12,
+                            'ContentType' => 'text/plain',
+                            'Body' => Stream::fromString('hello world!'),
+                        ]),
                         default => throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key'])),
                     };
             }
@@ -186,6 +190,7 @@ class S3AdapterTest extends TestCase
 
         static::assertSame('hello-world.txt', $object->key);
         static::assertSame('hello world!', $object->data?->getContents());
+        static::assertSame('text/plain', $object->getContentType());
         static::assertSame(['GetObject'], $invocations);
     }
 
@@ -291,6 +296,7 @@ class S3AdapterTest extends TestCase
                             $body = $command['Body'];
                             static::assertIsResource($body);
                             static::assertSame('hello world!', stream_get_contents($body));
+                            static::assertSame('text/plain', $command['ContentType']);
 
                             return new Result([]);
                     }

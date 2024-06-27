@@ -133,9 +133,9 @@ class FilesystemAdapterTest extends TestCase
      * @param string $key Key to retrieve.
      * @return void
      * @covers ::get()
-     * @testWith ["hello world", "example.txt"]
-     *           [false, "foo"]
-     *           [false, "bar"]
+     * @testWith [["hello world", "text/plain"], "example.txt"]
+     *           [[false, "application/octet-stream"], "foo"]
+     *           [[false, "application/octet-stream"], "bar"]
      */
     public function testGet(string|false $expected, string $key): void
     {
@@ -148,7 +148,7 @@ class FilesystemAdapterTest extends TestCase
 
         static::assertInstanceOf(FileObject::class, $object);
         static::assertSame($key, $object->key);
-        static::assertSame($expected, (string)$object->data);
+        static::assertSame($expected, [(string)$object->data, $object->getContentType()]);
     }
 
     /**
