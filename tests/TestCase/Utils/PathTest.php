@@ -4,13 +4,14 @@ declare(strict_types=1);
 namespace Chialab\ObjectStorage\Test\TestCase\Utils;
 
 use Chialab\ObjectStorage\Utils\Path;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
  * {@see \Chialab\ObjectStorage\Utils\Path} Test Case
- *
- * @coversDefaultClass \Chialab\ObjectStorage\Utils\Path
  */
+#[CoversClass(Path::class)]
 class PathTest extends TestCase
 {
     /**
@@ -18,7 +19,7 @@ class PathTest extends TestCase
      *
      * @return array<string, array{string[], string}>
      */
-    public function splitProvider(): array
+    public static function splitProvider(): array
     {
         return [
             '/dev/null' => [['', 'dev', 'null'], '/dev/null'],
@@ -37,9 +38,8 @@ class PathTest extends TestCase
      * @param string[] $expected Expected result.
      * @param string $path Input path.
      * @return void
-     * @dataProvider splitProvider()
-     * @covers ::split()
      */
+    #[DataProvider('splitProvider')]
     public function testSplit(array $expected, string $path): void
     {
         $actual = Path::split($path);
@@ -52,7 +52,7 @@ class PathTest extends TestCase
      *
      * @return array<string, string[]>
      */
-    public function joinProvider(): array
+    public static function joinProvider(): array
     {
         return [
             '' => [''],
@@ -70,10 +70,8 @@ class PathTest extends TestCase
      * @param string $expected Expected result.
      * @param string ...$paths Input paths.
      * @return void
-     * @dataProvider joinProvider()
-     * @covers ::join()
-     * @uses \Chialab\ObjectStorage\Utils\Path::split()
      */
+    #[DataProvider('joinProvider')]
     public function testJoin(string $expected, string ...$paths): void
     {
         $actual = Path::join(...$paths);

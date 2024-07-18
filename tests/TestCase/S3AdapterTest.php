@@ -10,24 +10,25 @@ use Aws\S3\S3Client;
 use Chialab\ObjectStorage\Exception\ObjectNotFoundException;
 use Chialab\ObjectStorage\Exception\StorageException;
 use Chialab\ObjectStorage\FileObject;
+use Chialab\ObjectStorage\FilePart;
 use Chialab\ObjectStorage\S3Adapter;
+use Chialab\ObjectStorage\Utils\Promise;
 use Chialab\ObjectStorage\Utils\Stream;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Stream as PsrStream;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
  * {@see \Chialab\ObjectStorage\S3Adapter} Test Case
- *
- * @coversDefaultClass \Chialab\ObjectStorage\S3Adapter
- * @uses \Chialab\ObjectStorage\S3Adapter::__construct()
- * @uses \Chialab\ObjectStorage\S3Adapter::prefix()
- * @uses \Chialab\ObjectStorage\FileObject
- * @uses \Chialab\ObjectStorage\FilePart
- * @uses \Chialab\ObjectStorage\Utils\Promise
- * @uses \Chialab\ObjectStorage\Utils\Stream
  */
+#[CoversClass(S3Adapter::class)]
+#[UsesClass(FileObject::class)]
+#[UsesClass(FilePart::class)]
+#[UsesClass(Promise::class)]
+#[UsesClass(Stream::class)]
 class S3AdapterTest extends TestCase
 {
     /**
@@ -52,74 +53,70 @@ class S3AdapterTest extends TestCase
     /**
      * Test {@see S3Adapter::url()} method.
      *
-     * @param string $expected
-     * @param string|null $baseUrl
-     * @param string $bucket
-     * @param string $prefix
-     * @param string $file
      * @return void
-     * @testWith ["https://example-bucket.s3.eu-south-1.amazonaws.com/prefix/read-me-tenderly.txt", null, "example-bucket", "prefix/", "read-me-tenderly.txt"]
-     *           ["https://example.xyz/profix/pro-players-csgo-major.txt", "https://example.xyz", "another-bucket", "profix/", "pro-players-csgo-major.txt"]
-     * @covers ::url()
-     * @covers ::prefix()
      */
-    public function testUrl(string $expected, string|null $baseUrl, string $bucket, string $prefix, string $file): void
+    public function testUrl(): void
     {
-        $client = static::s3ClientFactory();
-        $adapter = new S3Adapter($client, $bucket, $prefix, $baseUrl);
-        $url = $adapter->url($file);
+        $cases = [
+            ['https://example-bucket.s3.eu-south-1.amazonaws.com/prefix/read-me-tenderly.txt', null, 'example-bucket', 'prefix/', 'read-me-tenderly.txt'],
+            ['https://example.xyz/profix/pro-players-csgo-major.txt', 'https://example.xyz', 'another-bucket', 'profix/', 'pro-players-csgo-major.txt'],
+        ];
 
-        static::assertEquals($expected, $url);
+        foreach ($cases as [$expected, $baseUrl, $bucket, $prefix, $file]) {
+            $client = static::s3ClientFactory();
+            $adapter = new S3Adapter($client, $bucket, $prefix, $baseUrl);
+            $url = $adapter->url($file);
+
+            static::assertEquals($expected, $url);
+        }
     }
 
     /**
      * Test {@see S3Adapter::has()} method.
      *
-     * @param bool $expected Expected result.
-     * @param string $key Key.
      * @return void
-     * @testWith [true, "my-file.png"]
-     *           [false, "missing.pdf"]
-     * @covers ::has()
-     * @covers ::prefix()
      */
-    public function testHas(bool $expected, string $key): void
+    public function testHas(): void
     {
-        $invocations = [];
-        $client = static::s3ClientFactory(function (Command $command) use (&$invocations): Result {
-            $name = $command->getName();
-            $invocations[] = $name;
-            switch ($name) {
-                case 'HeadObject':
+        $cases = [
+            [true, 'my-file.png'],
+            [false, 'missing.pdf'],
+        ];
+
+        foreach ($cases as [$expected, $key]) {
+            $invocations = [];
+            $client = static::s3ClientFactory(function (Command $command) use (&$invocations): Result {
+                $name = $command->getName();
+                $invocations[] = $name;
+                if ($name === 'HeadObject') {
                     static::assertSame('example-bucket', $command['Bucket']);
 
                     return match ($command['Key']) {
                         'prefix/my-file.png' => new Result(['ContentLength' => 1]),
                         'prefix/missing.pdf' => throw new S3Exception('NoSuchKey', $command, [
-                                'code' => 'NoSuchKey',
-                                'response' => new Response(404),
-                            ]),
+                            'code' => 'NoSuchKey',
+                            'response' => new Response(404),
+                        ]),
                         default => throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key'])),
                     };
-            }
+                }
 
-            throw new InvalidArgumentException(sprintf('Unexpected command: %s', $name));
-        });
+                throw new InvalidArgumentException(sprintf('Unexpected command: %s', $name));
+            });
 
-        $adapter = new S3Adapter($client, 'example-bucket', 'prefix/');
+            $adapter = new S3Adapter($client, 'example-bucket', 'prefix/');
 
-        $actual = $adapter->has($key)->wait();
+            $actual = $adapter->has($key)->wait();
 
-        static::assertSame($expected, $actual);
-        static::assertSame(['HeadObject'], $invocations);
+            static::assertSame($expected, $actual);
+            static::assertSame(['HeadObject'], $invocations);
+        }
     }
 
     /**
      * Test {@see S3Adapter::has()} method with an unauthorized error.
      *
      * @return void
-     * @covers ::has()
-     * @covers ::prefix()
      */
     public function testHasUnauthorized(): void
     {
@@ -129,17 +126,16 @@ class S3AdapterTest extends TestCase
         $client = static::s3ClientFactory(function (Command $command) use (&$invocations): Result {
             $name = $command->getName();
             $invocations[] = $name;
-            switch ($name) {
-                case 'HeadObject':
-                    static::assertSame('example-bucket', $command['Bucket']);
+            if ($name === 'HeadObject') {
+                static::assertSame('example-bucket', $command['Bucket']);
 
-                    match ($command['Key']) {
-                        'prefix/unauthorized.php' => throw new S3Exception('AccessDenied', $command, [
-                            'code' => 'AccessDenied',
-                            'response' => new Response(403),
-                        ]),
-                        default => throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key'])),
-                    };
+                match ($command['Key']) {
+                    'prefix/unauthorized.php' => throw new S3Exception('AccessDenied', $command, [
+                        'code' => 'AccessDenied',
+                        'response' => new Response(403),
+                    ]),
+                    default => throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key'])),
+                };
             }
 
             throw new InvalidArgumentException(sprintf('Unexpected command: %s', $name));
@@ -158,8 +154,6 @@ class S3AdapterTest extends TestCase
      * Test {@see S3Adapter::get()} method.
      *
      * @return void
-     * @covers ::get()
-     * @covers ::prefix()
      */
     public function testGet(): void
     {
@@ -167,18 +161,17 @@ class S3AdapterTest extends TestCase
         $client = static::s3ClientFactory(function (Command $command) use (&$invocations): Result {
             $name = $command->getName();
             $invocations[] = $name;
-            switch ($name) {
-                case 'GetObject':
-                    static::assertSame('example-bucket', $command['Bucket']);
+            if ($name === 'GetObject') {
+                static::assertSame('example-bucket', $command['Bucket']);
 
-                    return match ($command['Key']) {
-                        'prefix/hello-world.txt' => new Result([
-                            'ContentLength' => 12,
-                            'ContentType' => 'text/plain',
-                            'Body' => Stream::fromString('hello world!'),
-                        ]),
-                        default => throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key'])),
-                    };
+                return match ($command['Key']) {
+                    'prefix/hello-world.txt' => new Result([
+                        'ContentLength' => 12,
+                        'ContentType' => 'text/plain',
+                        'Body' => Stream::fromString('hello world!'),
+                    ]),
+                    default => throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key'])),
+                };
             }
 
             throw new InvalidArgumentException(sprintf('Unexpected command: %s', $name));
@@ -198,8 +191,6 @@ class S3AdapterTest extends TestCase
      * Test {@see S3Adapter::get()} method with an object that does not exist.
      *
      * @return void
-     * @covers ::get()
-     * @covers ::prefix()
      */
     public function testGetNotFound(): void
     {
@@ -209,17 +200,16 @@ class S3AdapterTest extends TestCase
         $client = static::s3ClientFactory(function (Command $command) use (&$invocations): Result {
             $name = $command->getName();
             $invocations[] = $name;
-            switch ($name) {
-                case 'GetObject':
-                    static::assertSame('example-bucket', $command['Bucket']);
+            if ($name === 'GetObject') {
+                static::assertSame('example-bucket', $command['Bucket']);
 
-                    match ($command['Key']) {
-                        'prefix/missing.pdf' => throw new S3Exception('NoSuchKey', $command, [
-                            'code' => 'NoSuchKey',
-                            'response' => new Response(404),
-                        ]),
-                        default => throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key'])),
-                    };
+                match ($command['Key']) {
+                    'prefix/missing.pdf' => throw new S3Exception('NoSuchKey', $command, [
+                        'code' => 'NoSuchKey',
+                        'response' => new Response(404),
+                    ]),
+                    default => throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key'])),
+                };
             }
 
             throw new InvalidArgumentException(sprintf('Unexpected command: %s', $name));
@@ -238,8 +228,6 @@ class S3AdapterTest extends TestCase
      * Test {@see S3Adapter::get()} method with an unauthorized error.
      *
      * @return void
-     * @covers ::get()
-     * @covers ::prefix()
      */
     public function testGetUnauthorized(): void
     {
@@ -249,17 +237,16 @@ class S3AdapterTest extends TestCase
         $client = static::s3ClientFactory(function (Command $command) use (&$invocations): Result {
             $name = $command->getName();
             $invocations[] = $name;
-            switch ($name) {
-                case 'GetObject':
-                    static::assertSame('example-bucket', $command['Bucket']);
+            if ($name === 'GetObject') {
+                static::assertSame('example-bucket', $command['Bucket']);
 
-                    match ($command['Key']) {
-                        'prefix/unauthorized.php' => throw new S3Exception('AccessDenied', $command, [
-                            'code' => 'AccessDenied',
-                            'response' => new Response(403),
-                        ]),
-                        default => throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key'])),
-                    };
+                match ($command['Key']) {
+                    'prefix/unauthorized.php' => throw new S3Exception('AccessDenied', $command, [
+                        'code' => 'AccessDenied',
+                        'response' => new Response(403),
+                    ]),
+                    default => throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key'])),
+                };
             }
 
             throw new InvalidArgumentException(sprintf('Unexpected command: %s', $name));
@@ -278,8 +265,6 @@ class S3AdapterTest extends TestCase
      * Test {@see S3Adapter::put()} method.
      *
      * @return void
-     * @covers ::put()
-     * @covers ::prefix()
      */
     public function testPut(): void
     {
@@ -287,21 +272,19 @@ class S3AdapterTest extends TestCase
         $client = static::s3ClientFactory(function (Command $command) use (&$invocations): Result {
             $name = $command->getName();
             $invocations[] = $name;
-            switch ($name) {
-                case 'PutObject':
-                    static::assertSame('example-bucket', $command['Bucket']);
+            if ($name === 'PutObject') {
+                static::assertSame('example-bucket', $command['Bucket']);
 
-                    switch ($command['Key']) {
-                        case 'prefix/hello-world.txt':
-                            $body = $command['Body'];
-                            static::assertIsResource($body);
-                            static::assertSame('hello world!', stream_get_contents($body));
-                            static::assertSame('text/plain', $command['ContentType']);
+                if ($command['Key'] === 'prefix/hello-world.txt') {
+                    $body = $command['Body'];
+                    static::assertIsResource($body);
+                    static::assertSame('hello world!', stream_get_contents($body));
+                    static::assertSame('text/plain', $command['ContentType']);
 
-                            return new Result([]);
-                    }
+                    return new Result([]);
+                }
 
-                    throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key']));
+                throw new InvalidArgumentException(sprintf('Unexpected Key: %s', $command['Key']));
             }
 
             throw new InvalidArgumentException(sprintf('Unexpected command: %s', $name));

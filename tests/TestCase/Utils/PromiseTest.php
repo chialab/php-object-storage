@@ -7,20 +7,19 @@ use Chialab\ObjectStorage\Utils\Promise;
 use Exception;
 use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
  * {@see \Chialab\ObjectStorage\Utils\Promise} Test Case
- *
- * @coversDefaultClass \Chialab\ObjectStorage\Utils\Promise
  */
+#[CoversClass(Promise::class)]
 class PromiseTest extends TestCase
 {
     /**
      * Test {@see Promise::async()} method with a callback that returns a value.
      *
      * @return void
-     * @covers ::async()
      */
     public function testAsyncResolve(): void
     {
@@ -41,7 +40,6 @@ class PromiseTest extends TestCase
      * Test {@see Promise::async()} method with a callback that returns a promise.
      *
      * @return void
-     * @covers ::async()
      */
     public function testAsyncResolvePromise(): void
     {
@@ -63,7 +61,6 @@ class PromiseTest extends TestCase
      * Test {@see Promise::async()} method with a callback that throws a value.
      *
      * @return void
-     * @covers ::async()
      */
     public function testAsyncReject(): void
     {
