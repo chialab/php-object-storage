@@ -7,3 +7,4 @@
 /tests/tmp/*
 !/tests/tmp/.gitkeep
 /vendor/
+/.idea

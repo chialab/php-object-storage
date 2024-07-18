@@ -54,6 +54,7 @@ class InMemoryAdapter implements MultipartUploadInterface
      * Adapter constructor.
      *
      * @param string $baseUrl Base URL.
+     * @codeCoverageIgnore
      */
     public function __construct(protected readonly string $baseUrl)
     {

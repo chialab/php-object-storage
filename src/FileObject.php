@@ -23,8 +23,9 @@ class FileObject
      * @param string $key Object key.
      * @param \Psr\Http\Message\StreamInterface|null $data Object data.
      * @param array<string, mixed> $metadata Object metadata.
+     * @codeCoverageIgnore
      */
-    public function __construct(public readonly string $key, public readonly StreamInterface|null $data, public readonly array $metadata = [])
+    public function __construct(public readonly string $key, public readonly ?StreamInterface $data, public readonly array $metadata = [])
     {
     }
 

@@ -58,6 +58,7 @@ class FilesystemAdapter implements MultipartUploadInterface
      * @param string $multipartRoot Temporary path where incomplete multipart uploads should be stored.
      * @param string $baseUrl Public base URL for resources.
      * @param int $umask Umask for created resources.
+     * @codeCoverageIgnore
      */
     public function __construct(protected readonly string $root, protected readonly string $multipartRoot, protected readonly string $baseUrl, int $umask = 0077)
     {
