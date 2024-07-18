@@ -14,7 +14,7 @@
       <directory>tests</directory>
     </testsuite>
   </testsuites>
-  <source>
+  <source restrictWarnings="true">
     <include>
       <directory suffix=".php">src</directory>
     </include>
