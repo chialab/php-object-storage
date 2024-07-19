@@ -19,6 +19,8 @@ class Filesystem
 {
     /**
      * Private constructor to disable instantiating this class.
+     *
+     * @codeCoverageIgnore
      */
     private function __construct()
     {
@@ -73,11 +75,11 @@ class Filesystem
      *
      * @param string $path File path.
      * @param int $permissions File permissions.
-     * @param null|callable(resource): void $cb Callback to be invoked with open file handler while still retaining exclusive lock.
+     * @param callable(resource): void|null $cb Callback to be invoked with open file handler while still retaining exclusive lock.
      * @param resource ...$data Resource where data should be copied from.
      * @return void
      */
-    public static function lockingWrite(string $path, int $permissions, callable|null $cb, ...$data): void
+    public static function lockingWrite(string $path, int $permissions, ?callable $cb, ...$data): void
     {
         Assert::allResource($data, 'stream');
 

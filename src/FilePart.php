@@ -17,8 +17,9 @@ class FilePart
      * @param \Psr\Http\Message\StreamInterface|null $data Object data.
      * @param string|null $hash Hash as returned by the server when the part had been originally uploaded.
      * @param array<string, mixed> $metadata Object metadata.
+     * @codeCoverageIgnore
      */
-    public function __construct(public readonly int $part, public readonly StreamInterface|null $data, public readonly string|null $hash = null, public readonly array $metadata = [])
+    public function __construct(public readonly int $part, public readonly ?StreamInterface $data, public readonly ?string $hash = null, public readonly array $metadata = [])
     {
     }
 }

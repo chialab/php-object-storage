@@ -17,6 +17,8 @@ class Promise
 {
     /**
      * Private constructor to disable instantiating this class.
+     *
+     * @codeCoverageIgnore
      */
     private function __construct()
     {

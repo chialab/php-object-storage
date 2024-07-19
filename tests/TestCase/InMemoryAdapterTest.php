@@ -8,24 +8,25 @@ use Chialab\ObjectStorage\Exception\ObjectNotFoundException;
 use Chialab\ObjectStorage\FileObject;
 use Chialab\ObjectStorage\FilePart;
 use Chialab\ObjectStorage\InMemoryAdapter;
+use Chialab\ObjectStorage\Utils\Promise;
 use Chialab\ObjectStorage\Utils\Stream;
 use GuzzleHttp\Psr7\Stream as PsrStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\Constraint\Exception;
 use PHPUnit\Framework\Constraint\ExceptionCode;
-use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\Constraint\ExceptionMessageIsOrContains;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
 /**
  * {@see \Chialab\ObjectStorage\InMemoryAdapter} Test Case
- *
- * @coversDefaultClass \Chialab\ObjectStorage\InMemoryAdapter
- * @uses \Chialab\ObjectStorage\Utils\Promise
- * @uses \Chialab\ObjectStorage\Utils\Stream
- * @uses \Chialab\ObjectStorage\FileObject
- * @uses \Chialab\ObjectStorage\FilePart
- * @uses \Chialab\ObjectStorage\InMemoryAdapter::__construct()
  */
+#[CoversClass(InMemoryAdapter::class)]
+#[UsesClass(Promise::class)]
+#[UsesClass(Stream::class)]
+#[UsesClass(FileObject::class)]
+#[UsesClass(FilePart::class)]
 class InMemoryAdapterTest extends TestCase
 {
     /**
@@ -68,8 +69,8 @@ class InMemoryAdapterTest extends TestCase
             $callback();
         } catch (Throwable $e) {
             static::assertThat($e, new Exception(get_class($expected)));
-            static::assertThat($e, new ExceptionMessage($expected->getMessage()));
-            static::assertThat($e, new ExceptionCode($expected->getCode()));
+            static::assertThat($e, new ExceptionMessageIsOrContains($expected->getMessage()));
+            static::assertThat($e->getCode(), new ExceptionCode($expected->getCode()));
 
             return;
         }
@@ -81,7 +82,6 @@ class InMemoryAdapterTest extends TestCase
      * Test {@see InMemoryAdapter::url()} method.
      *
      * @return void
-     * @covers ::url()
      */
     public function testUrl(): void
     {
@@ -96,11 +96,6 @@ class InMemoryAdapterTest extends TestCase
      * and {@see InMemoryAdapter::delete()} methods.
      *
      * @return void
-     * @covers ::has()
-     * @covers ::get()
-     * @covers ::put()
-     * @covers ::delete()
-     * @covers ::copyObject()
      */
     public function testCRUD(): void
     {
@@ -139,12 +134,6 @@ class InMemoryAdapterTest extends TestCase
      * and {@see InMemoryAdapter::multipartFinalize()} with a successful flow.
      *
      * @return void
-     * @covers ::multipartInit()
-     * @covers ::multipartUpload()
-     * @covers ::multipartFinalize()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::has()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::get()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::copyObject()
      */
     public function testMultipartUpload(): void
     {
@@ -185,7 +174,6 @@ class InMemoryAdapterTest extends TestCase
      * Test {@see InMemoryAdapter::multipartUpload()} with an invalid token.
      *
      * @return void
-     * @covers ::multipartUpload()
      */
     public function testMultipartUploadNotInitialized(): void
     {
@@ -200,7 +188,6 @@ class InMemoryAdapterTest extends TestCase
      * Test {@see InMemoryAdapter::multipartFinalize()} with an invalid token.
      *
      * @return void
-     * @covers ::multipartFinalize()
      */
     public function testMultipartFinalizeNotInitialized(): void
     {
@@ -216,9 +203,6 @@ class InMemoryAdapterTest extends TestCase
      * Test {@see InMemoryAdapter::multipartFinalize()} with an invalid token.
      *
      * @return void
-     * @covers ::multipartFinalize()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::multipartInit()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::multipartUpload()
      */
     public function testMultipartFinalizeKeyMismatch(): void
     {
@@ -244,9 +228,6 @@ class InMemoryAdapterTest extends TestCase
      * Test {@see InMemoryAdapter::multipartFinalize()} with parts in the incorrect order.
      *
      * @return void
-     * @covers ::multipartFinalize()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::multipartInit()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::multipartUpload()
      */
     public function testMultipartFinalizeUnsortedParts(): void
     {
@@ -273,9 +254,6 @@ class InMemoryAdapterTest extends TestCase
      * latest uploaded part for its index.
      *
      * @return void
-     * @covers ::multipartFinalize()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::multipartInit()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::multipartUpload()
      */
     public function testMultipartFinalizeHashMismatch(): void
     {
@@ -301,9 +279,6 @@ class InMemoryAdapterTest extends TestCase
      * Test {@see InMemoryAdapter::multipartAbort()} method.
      *
      * @return void
-     * @covers ::multipartAbort()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::multipartInit()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::multipartUpload()
      */
     public function testMultipartAbort(): void
     {
@@ -327,8 +302,6 @@ class InMemoryAdapterTest extends TestCase
      * Test {@see InMemoryAdapter::multipartAbort()} method with an invalid token.
      *
      * @return void
-     * @covers ::multipartAbort()
-     * @uses \Chialab\ObjectStorage\InMemoryAdapter::multipartUpload()
      */
     public function testMultipartAbortNotInitialized(): void
     {

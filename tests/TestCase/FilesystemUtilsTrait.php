@@ -22,6 +22,7 @@ trait FilesystemUtilsTrait
      *
      * @param int $mode Permissions.
      * @return string Path.
+     * @throws \Random\RandomException
      */
     protected static function tempDir(int $mode = 0700): string
     {

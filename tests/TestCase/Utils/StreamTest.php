@@ -6,21 +6,21 @@ namespace Chialab\ObjectStorage\Test\TestCase\Utils;
 use Chialab\ObjectStorage\Utils\Stream;
 use Generator;
 use GuzzleHttp\Psr7\Stream as PsrStream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 /**
  * {@see \Chialab\ObjectStorage\Utils\Stream} Test Case
- *
- * @coversDefaultClass \Chialab\ObjectStorage\Utils\Stream
  */
+#[CoversClass(Stream::class)]
 class StreamTest extends TestCase
 {
     /**
      * Test {@see Stream::newTemporaryStream()} method.
      *
      * @return void
-     * @covers ::newTemporaryStream()
      */
     public function testNewTemporaryStream(): void
     {
@@ -35,8 +35,6 @@ class StreamTest extends TestCase
      * Test {@see Stream::fromString()} method.
      *
      * @return void
-     * @covers ::fromString()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
      */
     public function testFromString(): void
     {
@@ -52,8 +50,6 @@ class StreamTest extends TestCase
      * Test {@see Stream::streamCopyToStream()} method.
      *
      * @return void
-     * @covers ::streamCopyToStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
      */
     public function testStreamCopyToStream(): void
     {
@@ -82,8 +78,7 @@ class StreamTest extends TestCase
      * Test {@see Stream::psrCopyToStream()} method.
      *
      * @return void
-     * @covers ::psrCopyToStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
+     * @throws \Random\RandomException
      */
     public function testPsrCopyToStream(): void
     {
@@ -108,7 +103,6 @@ class StreamTest extends TestCase
      * Test {@see Stream::close()} method.
      *
      * @return void
-     * @covers ::close()
      */
     public function testClose(): void
     {
@@ -123,8 +117,9 @@ class StreamTest extends TestCase
      * Data provider for {@see StreamTest::testHash()} test case.
      *
      * @return \Generator<array{string, string, string}>
+     * @throws \Random\RandomException
      */
-    public function hashProvider(): Generator
+    public static function hashProvider(): Generator
     {
         $algorithms = array_intersect(hash_algos(), ['sha1', 'sha256', 'sha512', 'md5', 'adler32', 'crc32']);
         foreach ($algorithms as $alg) {
@@ -142,9 +137,8 @@ class StreamTest extends TestCase
      * @param string $data Data to be hashed.
      * @param string $algorithm Algorithm to use.
      * @return void
-     * @dataProvider hashProvider()
-     * @covers ::hash()
      */
+    #[DataProvider('hashProvider')]
     public function testHash(string $expected, string $data, string $algorithm): void
     {
         $fh = fopen('php://memory', 'wb') ?: throw new RuntimeException('Cannot open temporary stream');

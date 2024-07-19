@@ -7,17 +7,17 @@ use Chialab\ObjectStorage\Exception\StorageException;
 use Chialab\ObjectStorage\Test\TestCase\FilesystemUtilsTrait;
 use Chialab\ObjectStorage\Utils\Filesystem;
 use Chialab\ObjectStorage\Utils\Stream;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use SplFileInfo;
 
 /**
  * {@see \Chialab\ObjectStorage\Utils\Filesystem} Test Case
- *
- * @coversDefaultClass \Chialab\ObjectStorage\Utils\Filesystem
- * @uses \Chialab\ObjectStorage\Utils\Filesystem::recursiveLs()
- * @uses \Chialab\ObjectStorage\Utils\Filesystem::rmDir()
  */
+#[CoversClass(Filesystem::class)]
+#[UsesClass(Stream::class)]
 class FilesystemTest extends TestCase
 {
     use FilesystemUtilsTrait;
@@ -54,7 +54,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::chmod()} method.
      *
      * @return void
-     * @covers ::chmod()
      */
     public function testChmod(): void
     {
@@ -72,7 +71,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::chmod()} method with an existing file.
      *
      * @return void
-     * @covers ::chmod()
      */
     public function testChmodExistingFile(): void
     {
@@ -90,7 +88,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::lockingRead()} method with a file without concurrent access.
      *
      * @return void
-     * @covers ::lockingRead()
      */
     public function testLockingRead(): void
     {
@@ -108,7 +105,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::lockingRead()} method with a file that does not exist.
      *
      * @return void
-     * @covers ::lockingRead()
      */
     public function testLockingReadMissingFile(): void
     {
@@ -121,8 +117,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::lockingRead()} method with a file that does not exist.
      *
      * @return void
-     * @covers ::lockingRead()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingReadFileInUse(): void
     {
@@ -137,12 +131,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::lockingWrite()} method with a file without concurrent access.
      *
      * @return void
-     * @covers ::lockingWrite()
-     * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::fromString()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingWrite(): void
     {
@@ -161,12 +149,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::lockingWrite()} method with a file without concurrent access, and a callback.
      *
      * @return void
-     * @covers ::lockingWrite()
-     * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::fromString()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingWriteCallback(): void
     {
@@ -198,12 +180,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::lockingWrite()} method with a file without concurrent access and multiple data sources.
      *
      * @return void
-     * @covers ::lockingWrite()
-     * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::fromString()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingWriteMultipleDataSources(): void
     {
@@ -231,12 +207,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::lockingWrite()} method with a previously existing file without concurrent access.
      *
      * @return void
-     * @covers ::lockingWrite()
-     * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::fromString()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::streamCopyToStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingWriteExistingFile(): void
     {
@@ -256,11 +226,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::lockingWrite()} method with a file that does not exist.
      *
      * @return void
-     * @covers ::lockingWrite()
-     * @uses \Chialab\ObjectStorage\Utils\Filesystem::chmod()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::newTemporaryStream()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::fromString()
-     * @uses \Chialab\ObjectStorage\Utils\Stream::close()
      */
     public function testLockingWriteFileInUse(): void
     {
@@ -275,7 +240,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::mkDir()} method.
      *
      * @return void
-     * @covers ::mkDir()
      */
     public function testMkDir(): void
     {
@@ -290,7 +254,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::mkDir()} method with an existing directory.
      *
      * @return void
-     * @covers ::mkDir()
      */
     public function testMkDirExisting(): void
     {
@@ -306,7 +269,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::recursiveLs()} method.
      *
      * @return void
-     * @covers ::recursiveLs()
      */
     public function testRecursiveLs(): void
     {
@@ -354,8 +316,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::rmDir()} method.
      *
      * @return void
-     * @covers ::rmDir()
-     * @uses \Chialab\ObjectStorage\Utils\Filesystem::recursiveLs()
      */
     public function testRmDir(): void
     {
@@ -382,7 +342,6 @@ class FilesystemTest extends TestCase
      * Test {@see Filesystem::rmDir()} method with a directory that does not exist.
      *
      * @return void
-     * @covers ::rmDir()
      */
     public function testRmDirNotExisting(): void
     {

@@ -22,7 +22,7 @@ jobs:
       - name: 'Setup PHP'
         uses: 'shivammathur/setup-php@v2'
         with:
-          php-version: '8.1'
+          php-version: '8.2'
           tools: 'composer'
           coverage: 'none'
 
@@ -57,7 +57,7 @@ jobs:
       - name: 'Setup PHP'
         uses: 'shivammathur/setup-php@v2'
         with:
-          php-version: '8.1'
+          php-version: '8.2'
           tools: 'composer'
           coverage: 'none'
 
@@ -125,7 +125,7 @@ jobs:
         run: 'composer dump-autoload --classmap-authoritative --no-cache'
 
       - name: 'Run PHPUnit'
-        run: 'phpdbg -qrr vendor/bin/phpunit --coverage-clover=clover.xml'
+        run: 'composer run unit -- --coverage-clover=clover.xml'
 
       - name: 'Export coverage results'
         uses: 'codecov/codecov-action@v3'
@@ -151,7 +151,7 @@ jobs:
       - name: 'Setup PHP'
         uses: 'shivammathur/setup-php@v2'
         with:
-          php-version: '8.1'
+          php-version: '8.2'
           tools: 'composer'
 
       - name: 'Discover Composer cache directory'

@@ -30,6 +30,7 @@ class S3Adapter implements MultipartUploadInterface
      * @param string $bucket Bucket name.
      * @param string $prefix Key prefix.
      * @param string|null $baseUrl Custom base for objects URLs.
+     * @codeCoverageIgnore
      */
     public function __construct(
         protected readonly S3Client $client,
