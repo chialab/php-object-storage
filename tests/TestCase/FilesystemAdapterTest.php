@@ -26,7 +26,6 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Path::class)]
 #[UsesClass(Promise::class)]
 #[UsesClass(Stream::class)]
-#[UsesClass(Stream::class)]
 #[UsesClass(FileObject::class)]
 #[UsesClass(FilePart::class)]
 class FilesystemAdapterTest extends TestCase

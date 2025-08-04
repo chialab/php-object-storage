@@ -27,7 +27,7 @@ class StreamTest extends TestCase
         $tmp = Stream::newTemporaryStream();
 
         static::assertIsResource($tmp);
-        static::assertIsNotClosedResource($tmp);
+        static::assertIsNotClosedResource($tmp); // @phpstan-ignore-line
         static::assertSame(0, ftell($tmp));
     }
 
@@ -41,7 +41,7 @@ class StreamTest extends TestCase
         $fh = Stream::fromString('hello world!');
 
         static::assertIsResource($fh);
-        static::assertIsNotClosedResource($fh);
+        static::assertIsNotClosedResource($fh); // @phpstan-ignore-line
         static::assertSame(0, ftell($fh));
         static::assertSame('hello world!', stream_get_contents($fh));
     }
@@ -64,13 +64,13 @@ class StreamTest extends TestCase
         rewind($copy);
 
         static::assertIsResource($copy);
-        static::assertIsNotClosedResource($copy);
-        static::assertNotSame($fh, $copy);
+        static::assertIsNotClosedResource($copy); // @phpstan-ignore-line
+        static::assertNotSame($fh, $copy); // @phpstan-ignore-line
         static::assertSame(0, ftell($copy));
         static::assertSame($expected, stream_get_contents($copy));
         fclose($copy);
 
-        static::assertIsNotClosedResource($fh, 'Original resource should not be closed');
+        static::assertIsNotClosedResource($fh, 'Original resource should not be closed'); // @phpstan-ignore-line
         fclose($fh);
     }
 
@@ -94,7 +94,7 @@ class StreamTest extends TestCase
         $original->rewind();
 
         static::assertIsResource($copy);
-        static::assertIsNotClosedResource($copy);
+        static::assertIsNotClosedResource($copy); // @phpstan-ignore-line
         static::assertSame(0, ftell($copy));
         static::assertSame($original->getContents(), stream_get_contents($copy));
     }
@@ -110,7 +110,7 @@ class StreamTest extends TestCase
         static::assertIsResource($fh);
 
         Stream::close($fh);
-        static::assertIsClosedResource($fh);
+        static::assertIsClosedResource($fh); // @phpstan-ignore-line
     }
 
     /**
@@ -149,7 +149,7 @@ class StreamTest extends TestCase
 
         static::assertSame($expected, $actual);
 
-        static::assertIsNotClosedResource($fh, 'Original resource should not be closed');
+        static::assertIsNotClosedResource($fh, 'Original resource should not be closed'); // @phpstan-ignore-line
         fclose($fh);
     }
 }

@@ -95,7 +95,7 @@ class Filesystem
             if (ftruncate($fh, 0) !== true) {
                 throw new StorageException(sprintf('Cannot truncate file: %s', $path));
             }
-            array_walk($data, fn ($datum) => Stream::streamCopyToStream($datum, $fh));
+            array_walk($data, fn($datum) => Stream::streamCopyToStream($datum, $fh));
 
             if ($cb !== null) {
                 $cb($fh);

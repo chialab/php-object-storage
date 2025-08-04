@@ -60,7 +60,7 @@ class S3Adapter implements MultipartUploadInterface
             return sprintf(
                 '%s/%s',
                 rtrim($this->baseUrl, '/'),
-                ltrim($this->prefix($key), '/')
+                ltrim($this->prefix($key), '/'),
             );
         }
 
@@ -74,8 +74,8 @@ class S3Adapter implements MultipartUploadInterface
     {
         return $this->client->headObjectAsync(['Bucket' => $this->bucket, 'Key' => $this->prefix($key)])
             ->then(
-                fn (): bool => true,
-                fn (AwsException $e): PromiseInterface => $e->getStatusCode() === 404
+                fn(): bool => true,
+                fn(AwsException $e): PromiseInterface => $e->getStatusCode() === 404
                     ? new FulfilledPromise(false)
                     : new RejectedPromise(
                         new StorageException(sprintf('Cannot check object existence: %s', $key), previous: $e),
@@ -102,15 +102,15 @@ class S3Adapter implements MultipartUploadInterface
 
         return $this->client->getObjectAsync(['Bucket' => $this->bucket, 'Key' => $this->prefix($key)])
             ->then(
-                fn (Result $result): FileObject => new FileObject(
+                fn(Result $result): FileObject => new FileObject(
                     $key,
                     $toStream($result['Body']),
-                    array_diff_key($result->toArray(), ['Body' => null])
+                    array_diff_key($result->toArray(), ['Body' => null]),
                 ),
-                fn (AwsException $e) => new RejectedPromise(
+                fn(AwsException $e) => new RejectedPromise(
                     $e->getStatusCode() === 404
                         ? new ObjectNotFoundException(sprintf('Object not found: %s', $key))
-                        : new StorageException(sprintf('Cannot download object: %s', $key), previous: $e)
+                        : new StorageException(sprintf('Cannot download object: %s', $key), previous: $e),
                 ),
             );
     }
@@ -133,8 +133,8 @@ class S3Adapter implements MultipartUploadInterface
                 'Body' => $body,
             ])
             ->then(
-                fn () => null,
-                fn (AwsException $e): PromiseInterface => new RejectedPromise(
+                fn() => null,
+                fn(AwsException $e): PromiseInterface => new RejectedPromise(
                     new StorageException(sprintf('Cannot upload object: %s', $object->key), previous: $e),
                 ),
             );
@@ -151,8 +151,8 @@ class S3Adapter implements MultipartUploadInterface
                 'Key' => $this->prefix($key),
             ])
             ->then(
-                fn () => null,
-                fn (AwsException $e): PromiseInterface => new RejectedPromise(
+                fn() => null,
+                fn(AwsException $e): PromiseInterface => new RejectedPromise(
                     new StorageException(sprintf('Cannot delete object: %s', $key), previous: $e),
                 ),
             );
@@ -170,8 +170,8 @@ class S3Adapter implements MultipartUploadInterface
                 'ContentType' => $object->getContentType(),
             ])
             ->then(
-                fn (Result $result): string => is_string($result['UploadId']) ? $result['UploadId'] : throw new UnexpectedValueException(sprintf('Expected %s to be string, got %s', 'UploadId', get_debug_type($result['UploadId']))),
-                fn (AwsException $e): PromiseInterface => new RejectedPromise(
+                fn(Result $result): string => is_string($result['UploadId']) ? $result['UploadId'] : throw new UnexpectedValueException(sprintf('Expected %s to be string, got %s', 'UploadId', get_debug_type($result['UploadId']))),
+                fn(AwsException $e): PromiseInterface => new RejectedPromise(
                     new StorageException(sprintf('Cannot initialize multipart upload: %s', $object->key), previous: $e),
                 ),
             );
@@ -196,8 +196,8 @@ class S3Adapter implements MultipartUploadInterface
                 'Body' => $body,
             ])
             ->then(
-                fn (Result $result): string => is_string($result['ETag']) ? $result['ETag'] : throw new UnexpectedValueException(sprintf('Expected %s to be string, got %s', 'ETag', get_debug_type($result['ETag']))),
-                fn (AwsException $e): PromiseInterface => new RejectedPromise(
+                fn(Result $result): string => is_string($result['ETag']) ? $result['ETag'] : throw new UnexpectedValueException(sprintf('Expected %s to be string, got %s', 'ETag', get_debug_type($result['ETag']))),
+                fn(AwsException $e): PromiseInterface => new RejectedPromise(
                     new StorageException(sprintf('Cannot upload part %d: %s', $part->part, $object->key), previous: $e),
                 ),
             );
@@ -215,14 +215,14 @@ class S3Adapter implements MultipartUploadInterface
                 'UploadId' => $token,
                 'MultipartUpload' => [
                     'Parts' => array_map(
-                        fn (FilePart $part): array => ['PartNumber' => $part->part, 'ETag' => $part->hash],
+                        fn(FilePart $part): array => ['PartNumber' => $part->part, 'ETag' => $part->hash],
                         $parts,
                     ),
                 ],
             ])
             ->then(
-                fn () => null,
-                fn (AwsException $e): PromiseInterface => new RejectedPromise(
+                fn() => null,
+                fn(AwsException $e): PromiseInterface => new RejectedPromise(
                     new StorageException(sprintf('Cannot complete multipart upload: %s', $object->key), previous: $e),
                 ),
             );
@@ -240,8 +240,8 @@ class S3Adapter implements MultipartUploadInterface
                 'UploadId' => $token,
             ])
             ->then(
-                fn () => null,
-                fn (AwsException $e): PromiseInterface => new RejectedPromise(new StorageException('AWS API error', previous: $e)),
+                fn() => null,
+                fn(AwsException $e): PromiseInterface => new RejectedPromise(new StorageException('AWS API error', previous: $e)),
             );
     }
 }
