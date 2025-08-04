@@ -80,7 +80,7 @@ class FilesystemAdapter implements MultipartUploadInterface
     {
         $path = Path::join($this->root, $key);
 
-        return Promise::async(fn (): bool => is_file($path));
+        return Promise::async(fn(): bool => is_file($path));
     }
 
     /**
@@ -218,7 +218,7 @@ class FilesystemAdapter implements MultipartUploadInterface
                         rewind($fh);
                         $hash = Stream::hash($fh, static::hashAlgorithm());
                     },
-                    $source
+                    $source,
                 );
             } finally {
                 Stream::close($source);
@@ -280,7 +280,7 @@ class FilesystemAdapter implements MultipartUploadInterface
      */
     public function multipartAbort(FileObject $object, string $token): PromiseInterface
     {
-        return Promise::async(fn () => $this->multipartCleanup($token));
+        return Promise::async(fn() => $this->multipartCleanup($token));
     }
 
     /**

@@ -13,16 +13,16 @@ on:
 jobs:
   cs:
     name: 'Check coding style'
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-latest'
 
     steps:
       - name: 'Checkout current revision'
-        uses: 'actions/checkout@v3'
+        uses: 'actions/checkout@v4'
 
       - name: 'Setup PHP'
         uses: 'shivammathur/setup-php@v2'
         with:
-          php-version: '8.2'
+          php-version: '8.3'
           tools: 'composer'
           coverage: 'none'
 
@@ -31,7 +31,7 @@ jobs:
         run: 'echo "::set-output name=path::$(composer global config cache-dir)"'
 
       - name: 'Share Composer cache across runs'
-        uses: 'actions/cache@v3'
+        uses: 'actions/cache@v4'
         with:
           path: '${{ steps.cachedir.outputs.path }}'
           key: "composer-${{ github.job }}-${{ hashFiles('**/composer.json') }}"
@@ -47,17 +47,17 @@ jobs:
 
   stan:
     name: 'Static code analyzer'
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-latest'
     continue-on-error: true
 
     steps:
       - name: 'Checkout current revision'
-        uses: 'actions/checkout@v3'
+        uses: 'actions/checkout@v4'
 
       - name: 'Setup PHP'
         uses: 'shivammathur/setup-php@v2'
         with:
-          php-version: '8.2'
+          php-version: '8.3'
           tools: 'composer'
           coverage: 'none'
 
@@ -66,7 +66,7 @@ jobs:
         run: 'echo "::set-output name=path::$(composer global config cache-dir)"'
 
       - name: 'Share Composer cache across runs'
-        uses: 'actions/cache@v3'
+        uses: 'actions/cache@v4'
         with:
           path: '${{ steps.cachedir.outputs.path }}'
           key: "composer-${{ github.job }}-${{ hashFiles('**/composer.json') }}"
@@ -83,20 +83,21 @@ jobs:
   unit:
     name: 'Run unit tests'
     if: "!contains(github.event.commits[0].message, '[skip ci]') && !contains(github.event.commits[0].message, '[ci skip]')"
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-latest'
 
     strategy:
       fail-fast: false
       matrix:
         php:
-          - '8.2'
+          - '8.3'
+          - '8.4'
 
     env:
       PHP_VERSION: '${{ matrix.php }}'
 
     steps:
       - name: 'Checkout current revision'
-        uses: 'actions/checkout@v3'
+        uses: 'actions/checkout@v4'
 
       - name: 'Setup PHP'
         uses: 'shivammathur/setup-php@v2'
@@ -110,7 +111,7 @@ jobs:
         run: 'echo "::set-output name=path::$(composer global config cache-dir)"'
 
       - name: 'Share Composer cache across runs'
-        uses: 'actions/cache@v3'
+        uses: 'actions/cache@v4'
         with:
           path: '${{ steps.cachedir.outputs.path }}'
           key: "composer-${{ matrix.php }}-${{ hashFiles('**/composer.json') }}"
@@ -128,13 +129,13 @@ jobs:
         run: 'composer run unit -- --coverage-clover=clover.xml'
 
       - name: 'Export coverage results'
-        uses: 'codecov/codecov-action@v3'
+        uses: 'codecov/codecov-action@v4'
         with:
           file: './clover.xml'
           env_vars: PHP_VERSION
 
       - name: 'Archive code coverage results'
-        uses: 'actions/upload-artifact@v3'
+        uses: 'actions/upload-artifact@v4'
         with:
           name: 'PHP ${{ matrix.php }}'
           path: 'clover.xml'
@@ -142,16 +143,16 @@ jobs:
   unit-lowest:
     name: 'Run unit tests with lowest-matching dependencies versions'
     if: "!contains(github.event.commits[0].message, '[skip ci]') && !contains(github.event.commits[0].message, '[ci skip]')"
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-latest'
 
     steps:
       - name: 'Checkout current revision'
-        uses: 'actions/checkout@v3'
+        uses: 'actions/checkout@v4'
 
       - name: 'Setup PHP'
         uses: 'shivammathur/setup-php@v2'
         with:
-          php-version: '8.2'
+          php-version: '8.3'
           tools: 'composer'
 
       - name: 'Discover Composer cache directory'
@@ -159,7 +160,7 @@ jobs:
         run: 'echo "::set-output name=path::$(composer global config cache-dir)"'
 
       - name: 'Share Composer cache across runs'
-        uses: 'actions/cache@v3'
+        uses: 'actions/cache@v4'
         with:
           path: '${{ steps.cachedir.outputs.path }}'
           key: "composer-lowest-${{ hashFiles('**/composer.json') }}"

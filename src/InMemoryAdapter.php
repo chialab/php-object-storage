@@ -73,7 +73,7 @@ class InMemoryAdapter implements MultipartUploadInterface
      */
     public function has(string $key): PromiseInterface
     {
-        return Promise::async(fn (): bool => isset($this->storage[$key]));
+        return Promise::async(fn(): bool => isset($this->storage[$key]));
     }
 
     /**
@@ -81,8 +81,8 @@ class InMemoryAdapter implements MultipartUploadInterface
      */
     public function get(string $key): PromiseInterface
     {
-        return Promise::async(fn (): FileObject => static::copyObject(
-            $this->storage[$key] ?? throw new ObjectNotFoundException(sprintf('Object not found: %s', $key))
+        return Promise::async(fn(): FileObject => static::copyObject(
+            $this->storage[$key] ?? throw new ObjectNotFoundException(sprintf('Object not found: %s', $key)),
         ));
     }
 

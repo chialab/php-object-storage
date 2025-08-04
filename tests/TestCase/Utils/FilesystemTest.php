@@ -163,12 +163,12 @@ class FilesystemTest extends TestCase
             0600,
             function ($fh) use (&$read): void {
                 static::assertIsResource($fh);
-                static::assertIsNotClosedResource($fh);
+                static::assertIsNotClosedResource($fh); // @phpstan-ignore-line
                 static::assertTrue(rewind($fh), 'File handler could not be rewind');
 
                 $read = fread($fh, 1024);
             },
-            Stream::fromString('foo bar')
+            Stream::fromString('foo bar'),
         );
 
         static::assertFileExists($filename);
@@ -275,7 +275,7 @@ class FilesystemTest extends TestCase
         mkdir(
             $this->tmp . 'foo' . DIRECTORY_SEPARATOR . 'bar' . DIRECTORY_SEPARATOR . 'baz',
             0700,
-            true
+            true,
         );
         file_put_contents(
             $this->tmp . 'foo' . DIRECTORY_SEPARATOR . 'bar' . DIRECTORY_SEPARATOR . 'example.txt',
@@ -322,7 +322,7 @@ class FilesystemTest extends TestCase
         mkdir(
             $this->tmp . 'foo' . DIRECTORY_SEPARATOR . 'bar' . DIRECTORY_SEPARATOR . 'baz',
             0700,
-            true
+            true,
         );
         file_put_contents(
             $this->tmp . 'foo' . DIRECTORY_SEPARATOR . 'bar' . DIRECTORY_SEPARATOR . 'example.txt',

@@ -102,13 +102,13 @@ class InMemoryAdapterTest extends TestCase
         static::assertFalse($this->adapter->has('example')->wait());
         static::assertThrows(
             new ObjectNotFoundException('Object not found: example'),
-            fn () => $this->adapter->get('example')->wait(),
+            fn() => $this->adapter->get('example')->wait(),
         );
         $this->adapter->delete('example')->wait(); // This should not throw any exception.
 
         static::assertThrows(
             new BadDataException('Missing object data'),
-            fn () => $this->adapter->put(new FileObject('example', null))->wait(),
+            fn() => $this->adapter->put(new FileObject('example', null))->wait(),
         );
 
         $object = new FileObject('example', new PsrStream(Stream::fromString('hello world!')), [
@@ -294,7 +294,7 @@ class InMemoryAdapterTest extends TestCase
         // Assert that an aborted multipart upload cannot be resumed:
         static::assertThrows(
             new BadDataException('Multipart upload not initialized: ' . $token),
-            fn () => $this->adapter->multipartUpload($object, $token, $part)->wait(),
+            fn() => $this->adapter->multipartUpload($object, $token, $part)->wait(),
         );
     }
 
@@ -314,7 +314,7 @@ class InMemoryAdapterTest extends TestCase
         // Assert that an aborted multipart upload cannot be resumed:
         static::assertThrows(
             new BadDataException('Multipart upload not initialized: ' . $token),
-            fn () => $this->adapter->multipartUpload($object, $token, $part)->wait(),
+            fn() => $this->adapter->multipartUpload($object, $token, $part)->wait(),
         );
     }
 }

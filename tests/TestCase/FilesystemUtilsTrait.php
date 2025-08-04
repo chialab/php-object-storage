@@ -45,7 +45,7 @@ trait FilesystemUtilsTrait
         $proc = proc_open(
             [dirname(__DIR__) . DIRECTORY_SEPARATOR . 'flock', $file, 'tail', '-f', '/dev/null'],
             [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w'], 9 => ['pipe', 'w']],
-            $pipes
+            $pipes,
         );
         if ($proc === false) {
             throw new RuntimeException('Cannot open sub-process to retain file lock');
