@@ -28,7 +28,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Stream::class)]
 #[UsesClass(FileObject::class)]
 #[UsesClass(FilePart::class)]
-class FilesystemAdapterTest extends TestCase
+final class FilesystemAdapterTest extends TestCase
 {
     use FilesystemUtilsTrait;
 
