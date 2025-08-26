@@ -27,7 +27,7 @@ use Throwable;
 #[UsesClass(Stream::class)]
 #[UsesClass(FileObject::class)]
 #[UsesClass(FilePart::class)]
-class InMemoryAdapterTest extends TestCase
+final class InMemoryAdapterTest extends TestCase
 {
     /**
      * Test subject.
