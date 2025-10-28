@@ -135,7 +135,7 @@ jobs:
           env_vars: PHP_VERSION
 
       - name: 'Archive code coverage results'
-        uses: 'actions/upload-artifact@v4'
+        uses: 'actions/upload-artifact@v5'
         with:
           name: 'PHP ${{ matrix.php }}'
           path: 'clover.xml'
